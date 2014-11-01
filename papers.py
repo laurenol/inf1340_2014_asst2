@@ -26,12 +26,35 @@ def decide(input_file, watchlist_file, countries_file):
         an entry or transit visa is required, and whether there is currently a medical advisory
     :return: List of strings. Possible values of strings are: "Accept", "Reject", "Secondary", and "Quarantine"
     """
+
+    with open("test_returning_citizen.json","r") as file_reader:
+        input_file_contents = file_reader.read()
+
+    json_contents = json.loads(input_file_contents)
+    #CHECK FOR COMPLETENESS
+    for entry in json_contents:
+        valid = True
+
+        for locations in entry.get("home"):
+             if entry.get("home")[locations] == "":
+                valid = False
+        for places in entry.get("from"):
+             if entry.get("from")[places] == "":
+                valid = False
+        for key in entry:
+             if entry[key] =="":
+                valid = False
+
+    if valid == False:
+       return["Reject"]
+
+
     return ["Reject"]
 
 
 def valid_passport_format(passport_number):
     """
-    Checks whether a pasport number is five sets of five alpha-number characters separated by dashes
+    Checks whether a passport number is five sets of five alpha-number characters separated by dashes
     :param passport_number: alpha-numeric string
     :return: Boolean; True if the format is valid, False otherwise
     """
