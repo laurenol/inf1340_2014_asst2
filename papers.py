@@ -58,6 +58,7 @@ def decide(input_file, watchlist_file, countries_file):
     #CHECK FOR COMPLETENESS
     for entry in json_input_contents:
         valid = True
+
         if(not valid_passport_format(entry.get("passport"))):
             valid = False
 
@@ -74,7 +75,20 @@ def decide(input_file, watchlist_file, countries_file):
         if valid == False:
            return["Reject"]
 
+    #Check for valid Visas
+    for entries in json_input_contents:
+        entry_reason = entries.get("entry_reason")
 
+        if entry_reason == "visit" or entry_reason == "transit":
+                country = entries.get("home").get("country")
+
+        if countries_contents_json[country].get("visitor_visa_required") == "1"\
+                or countries_contents_json[country].get("transit_visa_required")== "1":
+            #Check dates
+            print("Its making me do this")
+
+
+    #Watchlist
     for entries in json_input_contents:
         passport_check = entries.get("passport")
         first_name_check = entries.get("first_name")
