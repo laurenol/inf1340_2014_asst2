@@ -40,7 +40,7 @@ def decide(input_file, watchlist_file, countries_file):
     for entries in json_input_contents:
         country_check = entries.get("from").get("country")
 
-        if countries_contents_json(country_check).get("medical_advisory") != "":
+        if countries_contents_json[country_check].get("medical_advisory") != "":
             return["Quarantine"]
 
         else:
@@ -50,28 +50,40 @@ def decide(input_file, watchlist_file, countries_file):
                 if countries_contents_json[via_country].get("medical_advisory") != "":
                     return["Quarantine"]
 
-
-
-
-
-
     #CHECK FOR COMPLETENESS
-    for entry in json_input_contents:
-        valid = True
+    #for entry in json_input_contents:
+    #    valid = True
 
-        for locations in entry.get("home"):
-             if entry.get("home")[locations] == "":
-                valid = False
-        for places in entry.get("from"):
-             if entry.get("from")[places] == "":
-                valid = False
-        for key in entry:
-             if entry[key] =="":
-                valid = False
+    #    for locations in entry.get("home"):
+    #         if entry.get("home")[locations] == "":
+    #            valid = False
+    #    for places in entry.get("from"):
+    #         if entry.get("from")[places] == "":
+    #            valid = False
+    #    for key in entry:
+    #         if entry[key] == "":
+    #            valid = False
 
-    if valid == False:
-       return["Reject"]
+        #if valid == False:
+        #   return["Reject"]
 
+    with open(watchlist_file, "r") as file_reader:
+        watchlist_file_contents = file_reader.read()
+
+    watchlist_contents_json = json.loads(watchlist_file_contents)
+
+    for entries in json_input_contents:
+        passport_check = entries.get("passport")
+        first_name_check = entries.get("first_name")
+        last_name_check = entries.get("last_name")
+
+        for person in watchlist_contents_json:
+            if person.get("passport") == passport_check.upper():
+                return["Secondary"]
+
+            elif person.get("first_name") == first_name_check.upper()\
+                    and person.get("last_name") == last_name_check.upper():
+                return["Secondary"]
 
     return ["Reject"]
 
