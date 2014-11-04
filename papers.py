@@ -58,6 +58,8 @@ def decide(input_file, watchlist_file, countries_file):
     #CHECK FOR COMPLETENESS
     for entry in json_input_contents:
         valid = True
+        if(not valid_passport_format(entry.get("passport"))):
+            valid = False
 
         for locations in entry.get("home"):
              if entry.get("home")[locations] == "":
@@ -72,7 +74,7 @@ def decide(input_file, watchlist_file, countries_file):
         if valid == False:
            return["Reject"]
 
-    """
+
     for entries in json_input_contents:
         passport_check = entries.get("passport")
         first_name_check = entries.get("first_name")
@@ -85,7 +87,7 @@ def decide(input_file, watchlist_file, countries_file):
             elif person.get("first_name") == first_name_check.upper()\
                     and person.get("last_name") == last_name_check.upper():
                 return["Secondary"]
-"""
+
     return ["Reject"]
 
 
