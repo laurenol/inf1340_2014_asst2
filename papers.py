@@ -13,6 +13,7 @@ __status__ = "Prototype"
 # imports one per line
 import re
 import datetime
+
 import json
 
 
@@ -75,26 +76,38 @@ def decide(input_file, watchlist_file, countries_file):
         if valid == False:
            return["Reject"]
 
+
     #Check for valid Visas
     for entries in json_input_contents:
         entry_reason = entries.get("entry_reason")
 
         if entry_reason == "visit" or entry_reason == "transit":
-                country = entries.get("home").get("country")
+            country = entries.get("home").get("country")
 
-        if countries_contents_json[country].get("visitor_visa_required") == "1"\
-                or countries_contents_json[country].get("transit_visa_required")== "1":
-
-                start_date = datetime.now()
-
-                end_date = entries.get("visa").get("date")
-                difference = start_date - end_date
-                difference_in_years = difference.days/365.2425
-                if difference_in_years >= 2:
+            if entry_reason == "visit" and countries_contents_json[country].get("visitor_visa_required") == "1":
+                if(entries.get("visa") == None):
                     return["Reject"]
+                else:
+                    end_date = entries.get("visa").get("date")
+                    if valid_date_format(end_date):
+                        if not valid_date_check(end_date):
+                            return["Reject"]
+                    else:
+                        return["Reject"]
 
+            if entry_reason =="transit" and countries_contents_json[country].get("transit_visa_required")== "1":
+                if(entries.get("visa") == None):
+                    return["Reject"]
+                else:
+                    if valid_date_format(entries.get("visa").get("date")):
+                        end_date = entries.get("visa").get("date")
 
-    #Watchlist
+                        if not valid_date_check(end_date):
+                            return["Reject"]
+                    else:
+                        return["Reject"]
+
+    #Watchlist Check
     for entries in json_input_contents:
         passport_check = entries.get("passport")
         first_name_check = entries.get("first_name")
@@ -107,12 +120,27 @@ def decide(input_file, watchlist_file, countries_file):
             elif person.get("first_name") == first_name_check.upper()\
                     and person.get("last_name") == last_name_check.upper():
                 return["Secondary"]
-
     return ["Reject"]
 
 
 
 
+def valid_date_check(issue_date):
+    """
+    Checks to see if the visa is valid (<2 years old)
+    :param issue_date: the date the visa was issued to the person
+    :return: Boolean: True if valid, false if not
+    """
+
+    start_date = datetime.datetime.today()
+    issue_date = datetime.datetime.strptime(issue_date, '%Y-%m-%d')
+    difference = start_date - issue_date
+    difference_in_years = difference.days/365.2425
+
+    if difference_in_years >= 2:
+        return False
+
+    return True
 
 def valid_passport_format(passport_number):
     """
