@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-""" Computer-based immigration office for Kanadia TESTING TEST TEST"""
+""" Computer-based immigration office for Kanadia"""
 
 __author__ = 'Susan Sim'
 __email__ = "ses@drsusansim.org"
@@ -30,9 +30,33 @@ def decide(input_file, watchlist_file, countries_file):
     with open("test_returning_citizen.json","r") as file_reader:
         input_file_contents = file_reader.read()
 
-    json_contents = json.loads(input_file_contents)
+    json_input_contents = json.loads(input_file_contents)
+
+    with open("countries.json", "r") as file_reader:
+        countries_file_contents = file_reader.read()
+
+    countries_contents_json = json.loads(countries_file_contents)
+
+    for entries in json_input_contents:
+        country_check = entries.get("from").get("country")
+
+        if countries_contents_json(country_check).get("medical_advisory") != "":
+            return["Quarantine"]
+
+        else:
+            if(entries.get("via") != None):
+                via_country = entries.get("via").get("country")
+
+                if countries_contents_json[via_country].get("medical_advisory") != "":
+                    return["Quarantine"]
+
+
+
+
+
+
     #CHECK FOR COMPLETENESS
-    for entry in json_contents:
+    for entry in json_input_contents:
         valid = True
 
         for locations in entry.get("home"):
@@ -59,6 +83,7 @@ def valid_passport_format(passport_number):
     :return: Boolean; True if the format is valid, False otherwise
     """
     passport_format = re.compile('.{5}-.{5}-.{5}-.{5}-.{5}')
+
 
     if passport_format.match(passport_number):
         return True
