@@ -27,16 +27,21 @@ def decide(input_file, watchlist_file, countries_file):
     :return: List of strings. Possible values of strings are: "Accept", "Reject", "Secondary", and "Quarantine"
     """
 
-    with open("test_returning_citizen.json","r") as file_reader:
+    with open(input_file,"r") as file_reader:
         input_file_contents = file_reader.read()
 
     json_input_contents = json.loads(input_file_contents)
 
-    with open("countries.json", "r") as file_reader:
+    with open(watchlist_file, "r") as file_reader:
+        watchlist_file_contents = file_reader.read()
+
+    watchlist_contents_json = json.loads(watchlist_file_contents)
+    with open(countries_file, "r") as file_reader:
         countries_file_contents = file_reader.read()
 
     countries_contents_json = json.loads(countries_file_contents)
 
+    #Medical Check
     for entries in json_input_contents:
         country_check = entries.get("from").get("country")
 
@@ -51,27 +56,23 @@ def decide(input_file, watchlist_file, countries_file):
                     return["Quarantine"]
 
     #CHECK FOR COMPLETENESS
-    #for entry in json_input_contents:
-    #    valid = True
+    for entry in json_input_contents:
+        valid = True
 
-    #    for locations in entry.get("home"):
-    #         if entry.get("home")[locations] == "":
-    #            valid = False
-    #    for places in entry.get("from"):
-    #         if entry.get("from")[places] == "":
-    #            valid = False
-    #    for key in entry:
-    #         if entry[key] == "":
-    #            valid = False
+        for locations in entry.get("home"):
+             if entry.get("home")[locations] == "":
+                valid = False
+        for places in entry.get("from"):
+             if entry.get("from")[places] == "":
+                valid = False
+        for key in entry:
+             if entry[key] == "":
+                valid = False
 
-        #if valid == False:
-        ##   return["Reject"]
+        if valid == False:
+           return["Reject"]
 
-    with open(watchlist_file, "r") as file_reader:
-        watchlist_file_contents = file_reader.read()
-
-    watchlist_contents_json = json.loads(watchlist_file_contents)
-
+    """
     for entries in json_input_contents:
         passport_check = entries.get("passport")
         first_name_check = entries.get("first_name")
@@ -84,8 +85,11 @@ def decide(input_file, watchlist_file, countries_file):
             elif person.get("first_name") == first_name_check.upper()\
                     and person.get("last_name") == last_name_check.upper():
                 return["Secondary"]
-
+"""
     return ["Reject"]
+
+
+
 
 
 def valid_passport_format(passport_number):
