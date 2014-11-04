@@ -84,8 +84,14 @@ def decide(input_file, watchlist_file, countries_file):
 
         if countries_contents_json[country].get("visitor_visa_required") == "1"\
                 or countries_contents_json[country].get("transit_visa_required")== "1":
-            #Check dates
-            print("Its making me do this")
+
+                start_date = datetime.now()
+
+                end_date = entries.get("visa").get("date")
+                difference = start_date - end_date
+                difference_in_years = difference.days/365.2425
+                if difference_in_years >= 2:
+                    return["Reject"]
 
 
     #Watchlist
