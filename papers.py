@@ -65,7 +65,7 @@ def decide(input_file, watchlist_file, countries_file):
     #            valid = False
 
         #if valid == False:
-        #   return["Reject"]
+        ##   return["Reject"]
 
     with open(watchlist_file, "r") as file_reader:
         watchlist_file_contents = file_reader.read()
