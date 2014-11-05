@@ -48,7 +48,7 @@ def decide(input_file, watchlist_file, countries_file):
 
         if countries_contents_json[country_check].get("medical_advisory") != "":
             return["Quarantine"]
-
+#
         else:
             if(entries.get("via") != None):
                 via_country = entries.get("via").get("country")
