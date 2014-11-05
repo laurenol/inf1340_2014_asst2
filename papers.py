@@ -1,16 +1,3 @@
-#!/usr/bin/env python3
-
-""" Computer-based immigration office for Kanadia"""
-
-__author__ = 'Susan Sim'
-__email__ = "ses@drsusansim.org"
-
-__copyright__ = "2014 Susan Sim"
-__license__ = "MIT License"
-
-__status__ = "Prototype"
-
-# imports one per line
 import re
 import datetime
 
@@ -42,90 +29,107 @@ def decide(input_file, watchlist_file, countries_file):
 
     countries_contents_json = json.loads(countries_file_contents)
 
-    #Medical Check
-    for entries in json_input_contents:
-        country_check = entries.get("from").get("country")
+    decisions = []
 
-        if countries_contents_json[country_check].get("medical_advisory") != "":
-            return["Quarantine"]
-#
+
+    for entries in json_input_contents:
+        must_quarantine = False
+        must_secondary = False
+        must_reject = False
+        must_accept = False
+
+        from_country = entries.get("from").get("country")
+        home_country = entries.get("home").get("country")
+
+        #Checking Completeness
+        valid = True
+
+        if(not valid_passport_format(entries.get("passport"))):
+            valid = False
+
+        for locations in entries.get("home"):
+             if entries.get("home")[locations] == "":
+                valid = False
+        for places in entries.get("from"):
+             if entries.get("from")[places] == "":
+                valid = False
+        for key in entries:
+             if entries[key] == "":
+                valid = False
+
+        if valid == False:
+           must_reject = True
+
+        #Medical Check
+
+
+        if countries_contents_json[from_country].get("medical_advisory") != "":
+            must_quarantine = True
+
         else:
             if(entries.get("via") != None):
                 via_country = entries.get("via").get("country")
 
                 if countries_contents_json[via_country].get("medical_advisory") != "":
-                    return["Quarantine"]
+                    must_quarantine = True
 
-    #CHECK FOR COMPLETENESS
-    for entry in json_input_contents:
-        valid = True
 
-        if(not valid_passport_format(entry.get("passport"))):
-            valid = False
 
-        for locations in entry.get("home"):
-             if entry.get("home")[locations] == "":
-                valid = False
-        for places in entry.get("from"):
-             if entry.get("from")[places] == "":
-                valid = False
-        for key in entry:
-             if entry[key] == "":
-                valid = False
+        if home_country == "KAN":
+            must_accept = True
 
-        if valid == False:
-           return["Reject"]
-
-    for entries in json_input_contents:
-        country = entries.get("home").get("country")
-
-        if country == "KAN":
-            return["Accept"]
-
-    #Check for valid Visas
-    for entries in json_input_contents:
+        #Check for valid visas
         entry_reason = entries.get("entry_reason")
 
         if entry_reason == "visit" or entry_reason == "transit":
-            country = entries.get("home").get("country")
+            home_country = entries.get("home").get("country")
 
-            if entry_reason == "visit" and countries_contents_json[country].get("visitor_visa_required") == "1":
+            if entry_reason == "visit" and countries_contents_json[home_country].get("visitor_visa_required") == "1":
                 if(entries.get("visa") == None):
-                    return["Reject"]
+                    must_reject = True
                 else:
                     end_date = entries.get("visa").get("date")
                     if valid_date_format(end_date):
                         if not valid_date_check(end_date):
-                            return["Reject"]
+                            must_reject = True
                     else:
                         return["Reject"]
 
-            if entry_reason =="transit" and countries_contents_json[country].get("transit_visa_required")== "1":
+            if entry_reason =="transit" and countries_contents_json[home_country].get("transit_visa_required")== "1":
                 if(entries.get("visa") == None):
-                    return["Reject"]
+                    must_reject = True
                 else:
                     if valid_date_format(entries.get("visa").get("date")):
                         end_date = entries.get("visa").get("date")
 
                         if not valid_date_check(end_date):
-                            return["Reject"]
+                            must_reject = True
                     else:
-                        return["Reject"]
+                        must_reject = True
 
-    #Watchlist Check
-    for entries in json_input_contents:
+        #Watchlist Check
         passport_check = entries.get("passport")
         first_name_check = entries.get("first_name")
         last_name_check = entries.get("last_name")
 
         for person in watchlist_contents_json:
             if person.get("passport") == passport_check.upper():
-                return["Secondary"]
+                must_secondary = True
 
             elif person.get("first_name") == first_name_check.upper()\
                     and person.get("last_name") == last_name_check.upper():
-                return["Secondary"]
-    return ["Reject"]
+                must_secondary = True
+
+        if must_quarantine:
+            decisions.append("Quarantine")
+        elif must_reject:
+            decisions.append("Reject")
+        elif must_secondary:
+            decisions.append("Secondary")
+        else:
+            decisions.append("Accept")
+
+    return decisions
 
 
 
