@@ -76,6 +76,11 @@ def decide(input_file, watchlist_file, countries_file):
         if valid == False:
            return["Reject"]
 
+    for entries in json_input_contents:
+        country = entries.get("home").get("country")
+
+        if country == "KAN":
+            return["Accept"]
 
     #Check for valid Visas
     for entries in json_input_contents:
