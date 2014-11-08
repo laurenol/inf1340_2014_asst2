@@ -32,45 +32,41 @@ def decide(input_file, watchlist_file, countries_file):
     decisions = []
 
     for entries in json_input_contents:
-        must_quarantine = False
-        must_secondary = False
-        must_reject = False
-        must_accept = False
 
         home_country = entries.get("home").get("country")
-
-        if home_country == "KAN":
-            must_accept = True
-
-        #Checking Completeness
-        #Medical Check
-        #Check for valid visas
-        #Watchlist Check
         passport_check = entries.get("passport")
         first_name_check = entries.get("first_name")
         last_name_check = entries.get("last_name")
 
         if check_quarantine(entries, countries_contents_json):
-            must_quarantine = True
-        elif check_record_completeness(entries):
-            must_reject = True
-        elif valid_visa_check(entries, countries_contents_json):
-            must_reject = True
-        elif watchlist_check(passport_check,first_name_check,last_name_check,watchlist_contents_json):
-            must_secondary = True
-        else:
-            must_accept = True
-
-        if must_quarantine:
             decisions.append("Quarantine")
-        elif must_reject:
+
+        elif check_record_completeness(entries):
             decisions.append("Reject")
-        elif must_secondary:
+
+        elif valid_visa_check(entries, countries_contents_json) and home_country != "KAN":
+            decisions.append("Reject")
+
+        elif watchlist_check(passport_check,first_name_check,last_name_check,watchlist_contents_json):
             decisions.append("Secondary")
+
+        elif KAN_check(entries):
+            decisions.append("Accept")
         else:
             decisions.append("Accept")
 
     return decisions
+
+def KAN_check(entry):
+    """
+
+    :param entry:
+    :return: return true if accepted, false if not
+    """
+    if entry.get("home").get("country") == "KAN" and entry.get("entry_reason") == "returning":
+        return True
+
+    return False
 
 def watchlist_check(passport, first_name, last_name, watchlist_contents):
     """
