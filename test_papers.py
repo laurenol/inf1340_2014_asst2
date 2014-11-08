@@ -13,8 +13,10 @@ from papers import decide
 
 def test_basic():
     assert decide("test_returning_citizen.json", "watchlist.json", "countries.json") == ["Accept", "Accept"]
-    #assert decide("test_watchlist.json", "watchlist.json", "countries.json") == ["Secondary"]
-    assert decide("test_quarantine.json", "watchlist.json", "countries.json") == ["Quarantine", "Quarantine", "Accept", "Accept"]
+    assert decide("test_quarantine_over_accept.json", "watchlist.json", "countries.json") == \
+                                                                                ["Quarantine", "Quarantine"]
+    assert decide("test_reject_over_accept.json", "watchlist.json", "countries.json") == ["Reject"]
+    assert decide("test_secondary_over_accept.json", "watchlist.json", "countries.json") == ["Secondary"]
 
 def test_quarantine():
     assert decide("test_quarantine.json", "watchlist.json", "countries.json") == ["Quarantine", "Quarantine", "Accept",
