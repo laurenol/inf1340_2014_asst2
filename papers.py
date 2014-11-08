@@ -23,6 +23,7 @@ def decide(input_file, watchlist_file, countries_file):
         watchlist_file_contents = file_reader.read()
 
     watchlist_contents_json = json.loads(watchlist_file_contents)
+
     with open(countries_file, "r") as file_reader:
         countries_file_contents = file_reader.read()
 
@@ -35,7 +36,6 @@ def decide(input_file, watchlist_file, countries_file):
         must_secondary = False
         must_reject = False
         must_accept = False
-
 
         home_country = entries.get("home").get("country")
 
@@ -114,9 +114,9 @@ def valid_visa_check(entry, countries_contents):
                     if not valid_date_check(end_date):
                         return True
                 else:
-                    return["Reject"]
+                    return True
 
-        if entry_reason =="transit" and countries_contents[home_country].get("transit_visa_required")== "1":
+        if entry_reason == "transit" and countries_contents[home_country].get("transit_visa_required") == "1":
             if entry.get("visa") is None :
                 return True
             else:

@@ -17,13 +17,23 @@ from papers import decide
 
 def test_basic():
     assert decide("test_returning_citizen.json", "watchlist.json", "countries.json") == ["Accept", "Accept"]
-    assert decide("test_watchlist.json", "watchlist.json", "countries.json") == ["Secondary"]
-    assert decide("test_quarantine.json", "watchlist.json", "countries.json") == ["Quarantine"]
+    #assert decide("test_watchlist.json", "watchlist.json", "countries.json") == ["Secondary"]
+    assert decide("test_quarantine.json", "watchlist.json", "countries.json") == ["Quarantine", "Quarantine", "Accept", "Accept"]
 
+def test_quarantine():
+    assert decide("test_quarantine.json", "watchlist.json", "countries.json") == ["Quarantine", "Quarantine", "Accept",
+                                                                                  "Accept"]
 
-#def test_files():
- #   with pytest.raises(FileNotFoundError):
-  #      decide("test_returning_citizen.json", "", "countries.json")
+def watchlist_test():
+    assert decide("test_quarantine.json", "watchlist.json", "countries.json") == ["Secondary", "Secondary"]
+
+def completeness_test():
+    assert decide("test_completeness.json", "watchlist.json", "countries.json") == ["Reject" , "Reject" , "Reject",
+                                                                                    "Accept"]
+def test_files():
+   with pytest.raises(FileNotFoundError):
+
+        decide("test_returning_citizen.json", "", "countries.json")
 
 # add functions for other tests
 
