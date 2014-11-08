@@ -24,12 +24,24 @@ def test_quarantine():
     assert decide("test_quarantine.json", "watchlist.json", "countries.json") == ["Quarantine", "Quarantine", "Accept",
                                                                                   "Accept"]
 
-def watchlist_test():
-    assert decide("test_quarantine.json", "watchlist.json", "countries.json") == ["Secondary", "Secondary"]
+def test_watchlist():
+    assert decide("test_watchlist.json", "watchlist.json", "countries.json") == ["Secondary", "Secondary"]
 
-def completeness_test():
+def test_completeness():
     assert decide("test_completeness.json", "watchlist.json", "countries.json") == ["Reject" , "Reject" , "Reject",
                                                                                     "Accept"]
+def test_have_visa():
+    assert decide("test_have_visa.json", "watchlist.json", "countries.json") == ["Reject", "Accept", "Reject", "Accept"]
+
+def test_visa_date():
+    assert decide("test_visa_date.json", "watchlist.json", "countries.json") == ["Reject", "Reject"]
+
+def test_passport_format():
+    assert decide("test_passport_format.json", "watchlist.json", "countries.json") == ["Reject", "Reject"]
+
+def test_date_format():
+    assert decide("test_date_format.json", "watchlist.json", "countries.json") == ["Reject", "Reject"]
+
 def test_files():
    with pytest.raises(FileNotFoundError):
 
