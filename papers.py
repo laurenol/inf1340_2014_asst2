@@ -235,7 +235,7 @@ def valid_passport_format(passport_number):
     :return: Boolean; True if format is valid, False if otherwise
     """
 
-    passport_format = re.compile('.{5}-.{5}-.{5}-.{5}-.{5}')
+    passport_format = re.compile('^\w{5}-\w{5}-\w{5}-\w{5}-\w{5}$')
 
     if passport_format.match(passport_number):
         return True
