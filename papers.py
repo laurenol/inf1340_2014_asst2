@@ -5,14 +5,13 @@
 This module contains nine functions. The main function is decide and utilizes the other eight functions to review
 documents provided by travelers and directives from the ministry to control the flow of people entering Kanadia.
 
-The function receive three files: the input_file, watchlist_file, and countries_file. If one of these files is not
+The function receives three files: the input_file, watchlist_file, and countries_file. If one of these files is not
 present, a "FileNotFoundError" is raised.
 
 A traveller can receive a decision of "Accept", "Reject", "Secondary", or "Quarantine".
 
 Example:
     $ python papers.py
-
 """
 
 __author__ = "Lauren Olar and Christopher Piche"
@@ -31,19 +30,16 @@ import json
 
 
 def decide(input_file, watchlist_file, countries_file):
-    """
-
-    Decides whether a traveller's entry into Kanadia should be accepted
+    """Decides whether a traveller's entry into Kanadia should be accepted.
 
     :param input_file: The name of a JSON formatted file that contains cases to decide
     :param watchlist_file: The name of a JSON formatted file that contains names and passport numbers on a watchlist
     :param countries_file: The name of a JSON formatted file that contains country data, such as whether
         an entry or transit visa is required, and whether there is currently a medical advisory
     :return: List of strings. Possible values of strings are: "Accept", "Reject", "Secondary", and "Quarantine"
-
     """
 
-    #Opening the three aforementioned files to get data for review and loading their contents
+    #Opening the three aforementioned files to get data for review and loading their contents.
     with open(input_file, "r") as file_reader:
         input_file_contents = file_reader.read()
 
@@ -90,16 +86,16 @@ def decide(input_file, watchlist_file, countries_file):
 
     return decisions
 
-
+#Most functions that follow could have been collapsed into the decide function. However,
+#for readability and understandability, and use of functions by other modules or functions, the functions below are
+#separated as appears.
 def kanadia_check(entry):
-    """
-
-    Checks if returning person is Kanadian citizen.
+    """Checks if returning person is Kanadian citizen.
 
     :param entry: record of person under review, in dictionary format
     :return: Boolean; True if accepted, False if otherwise
-
     """
+
     if entry.get("home").get("country") == "KAN" and entry.get("entry_reason") == "returning":
         return True
 
@@ -107,16 +103,13 @@ def kanadia_check(entry):
 
 
 def watchlist_check(passport, first_name, last_name, watchlist_contents):
-    """
-
-    Checks passport and/or combination of first_name and last_name to determine if person is on watchlist.
+    """Checks passport and, or, combination of first_name and last_name to determine if person is on watchlist.
 
     :param passport: string of five sets of five alpha-numeric characters separated by dashes
     :param first_name: string of citizen's first name
     :param last_name: string of citizen's last name
     :param watchlist_contents: dictionary of JSON file contents containing people on the watchlist
     :return: Boolean; True if on watchlist, False if otherwise
-
     """
 
     for person in watchlist_contents:
@@ -133,15 +126,12 @@ def watchlist_check(passport, first_name, last_name, watchlist_contents):
 
 
 def valid_visa_check(entry, countries_contents):
-    """
-
-    Checks, if necessary, based on travel and visit entry, whether person has visa and whether valid.
+    """Checks, if necessary, based on travel and visit entry, whether person has visa and whether valid.
 
     :param entry: record of person under review, in dictionary format
     :param countries_contents: the name of a JSON formatted file that contains country data such as whether a transit
     or visit visa is required
     :return: Boolean; True if visa is not valid or not found, False if otherwise
-
     """
 
     entry_reason = entry.get("entry_reason")
@@ -175,15 +165,12 @@ def valid_visa_check(entry, countries_contents):
 
 
 def check_quarantine(entry, countries_contents):
-    """
-
-    Checks to see if person is entering from, or travelling via, a country with a medical advisory.
+    """Checks to see if person is entering from, or travelling via, a country with a medical advisory.
 
     :param entry: record of person under review, in dictionary format
     :param countries_contents: the name of a JSON formatted file that contains country data such as whether there is
     currently a medical advisory
     :return: Boolean; True if there is a medical advisory, False if otherwise
-
     """
 
     from_country = entry.get("from").get("country")
@@ -201,13 +188,10 @@ def check_quarantine(entry, countries_contents):
 
 
 def check_record_completeness(entry):
-    """
-
-    Checks the completeness of person's required information
+    """Checks the completeness of person's required information.
 
     :param entry: record of person under review, in dictionary format
     :return: Boolean; True if incomplete information, False if otherwise
-
     """
 
     if not valid_passport_format(entry.get("passport")):
@@ -227,13 +211,10 @@ def check_record_completeness(entry):
 
 
 def valid_date_check(issue_date):
-    """
-
-    Checks to see if the visa is valid, less than two years old
+    """Checks to see if the visa is valid, less than two years old.
 
     :param issue_date: string of the date the visa was issued to the person
     :return: Boolean; True if the format is valid, False if otherwise
-
     """
 
     start_date = datetime.datetime.today()
@@ -248,13 +229,10 @@ def valid_date_check(issue_date):
 
 
 def valid_passport_format(passport_number):
-    """
-
-    Checks whether a passport number is five sets of five alpha-numeric characters separated by dashes
+    """Checks whether a passport number is five sets of five alpha-numeric characters separated by dashes.
 
     :param passport_number: alpha-numeric string
     :return: Boolean; True if format is valid, False if otherwise
-
     """
 
     passport_format = re.compile('.{5}-.{5}-.{5}-.{5}-.{5}')
@@ -266,13 +244,10 @@ def valid_passport_format(passport_number):
 
 
 def valid_date_format(date_string):
-    """
-
-    Checks whether a date has the format YYYY-mm-dd in numbers
+    """Checks whether a date has the format YYYY-mm-dd in numbers.
 
     :param date_string: date to be checked
     :return: Boolean; True if format is valid, False if otherwise
-
     """
 
     try:
