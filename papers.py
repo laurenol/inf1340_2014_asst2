@@ -89,6 +89,8 @@ def decide(input_file, watchlist_file, countries_file):
 #Most functions that follow could have been collapsed into the decide function. However,
 #for readability and understandability, and use of functions by other modules or functions, the functions below are
 #separated as appears.
+
+
 def kanadia_check(entry):
     """Checks if returning person is Kanadian citizen.
 
@@ -140,8 +142,8 @@ def valid_visa_check(entry, countries_contents):
     if entry_reason == "visit" or entry_reason == "transit":
 
         if entry_reason == "visit" and countries_contents[home_country].get("visitor_visa_required") == "1":
-            #Check that citizen has visa, as required
-            if entry.get("visa") is None:
+            #Check that citizen has visa and it is a valid format, as required
+            if entry.get("visa") is None or not valid_visa_format(entry.get("visa").get("code")):
                 return True
             else:
                 end_date = entry.get("visa").get("date")
@@ -152,7 +154,7 @@ def valid_visa_check(entry, countries_contents):
                     return True
 
         if entry_reason == "transit" and countries_contents[home_country].get("transit_visa_required") == "1":
-            if entry.get("visa") is None:
+            if entry.get("visa") is None or not valid_visa_format(entry.get("visa").get("code")):
                 return True
             else:
                 end_date = entry.get("visa").get("date")
@@ -162,6 +164,23 @@ def valid_visa_check(entry, countries_contents):
                 else:
                     return True
     return False
+
+
+def valid_visa_format(visa_check):
+    """
+    Checks to see if the persons visa has the valid format of two sets of 5 alpha-numeric characters separated by
+    dashes.
+
+    :param visa_check: alpha-numeric string
+    :return: Boolean; True if valid format, False if otherwise
+    """
+
+    visa_format = re.compile('^\w{5}-\w{5}$')
+
+    if visa_format.match(visa_check):
+        return True
+    else:
+        return False
 
 
 def check_quarantine(entry, countries_contents):
